@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Difficulty, QuestionType } from '@/types';
-import { getWeakPoints, type WeakPoint } from '@/lib/storage';
 
 interface SetupFormProps {
   onStart: (config: {
@@ -29,17 +28,12 @@ const QUESTION_TYPES: { value: QuestionType; label: string; icon: string }[] = [
   { value: 'essay', label: '大题', icon: '📄' },
 ];
 
-export default function SetupForm({ onStart, loading, hasHistory }: SetupFormProps) {
+export default function SetupForm({ onStart, loading }: SetupFormProps) {
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [count, setCount] = useState(5);
   const [types, setTypes] = useState<QuestionType[]>(['choice']);
-  const [weakPoints, setWeakPoints] = useState<WeakPoint[]>([]);
-
-  useEffect(() => {
-    setWeakPoints(getWeakPoints());
-  }, [hasHistory]);
 
   const toggleType = (type: QuestionType) => {
     setTypes(prev =>
@@ -50,53 +44,13 @@ export default function SetupForm({ onStart, loading, hasHistory }: SetupFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !topic.trim() || types.length === 0) return;
-
-    // Build weak points prompt
-    let weakPointsPrompt = '';
-    if (weakPoints.length > 0) {
-      const top5 = weakPoints.slice(0, 5);
-      const lines = top5.map(wp =>
-        `- ${wp.subject} · ${wp.topic}：错 ${wp.wrongCount} 题（错误率 ${Math.round((wp.wrongCount / wp.totalCount) * 100)}%）`
-      );
-      weakPointsPrompt = `\n\n【该学生的历史薄弱环节】\n${lines.join('\n')}\n请在这些薄弱知识点上适当加大出题难度和深度，帮助学生针对性强化。`;
-    }
-
-    onStart({ subject: subject.trim(), topic: topic.trim(), difficulty, count, types, weakPointsPrompt });
-  };
-
-  const handleWeakPointClick = (wp: WeakPoint) => {
-    setSubject(wp.subject);
-    setTopic(wp.topic);
+    onStart({ subject: subject.trim(), topic: topic.trim(), difficulty, count, types });
   };
 
   const isValid = subject.trim() && topic.trim() && types.length > 0;
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto space-y-6">
-      {/* Weak Points Alert */}
-      {weakPoints.length > 0 && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <p className="text-sm font-medium text-amber-800 mb-2">⚠️ 历史薄弱环节（点击可自动填入）</p>
-          <div className="flex flex-wrap gap-2">
-            {weakPoints.slice(0, 5).map((wp, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleWeakPointClick(wp)}
-                className="px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-xs text-amber-800 hover:bg-amber-100 hover:border-amber-400 transition-all cursor-pointer"
-                title={`错${wp.wrongCount}题 / 共${wp.totalCount}题`}
-              >
-                {wp.subject} · {wp.topic}
-                <span className="ml-1 text-red-500 font-medium">✕{wp.wrongCount}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-amber-600 mt-2">
-            AI 出题时会针对这些薄弱环节加强练习
-          </p>
-        </div>
-      )}
-
       {/* Subject */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">📚 学科 / 课程名称</label>
