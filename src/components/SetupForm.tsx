@@ -31,6 +31,7 @@ const QUESTION_TYPES: { value: QuestionType; label: string; icon: string }[] = [
 export default function SetupForm({ onStart, loading }: SetupFormProps) {
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
+  const [isRandom, setIsRandom] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [count, setCount] = useState(5);
   const [types, setTypes] = useState<QuestionType[]>(['choice']);
@@ -43,11 +44,12 @@ export default function SetupForm({ onStart, loading }: SetupFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subject.trim() || !topic.trim() || types.length === 0) return;
-    onStart({ subject: subject.trim(), topic: topic.trim(), difficulty, count, types });
+    const finalTopic = isRandom ? '随机（从该课程中任意选择知识点）' : topic.trim();
+    if (!subject.trim() || (!isRandom && !topic.trim()) || types.length === 0) return;
+    onStart({ subject: subject.trim(), topic: finalTopic, difficulty, count, types });
   };
 
-  const isValid = subject.trim() && topic.trim() && types.length > 0;
+  const isValid = subject.trim() && (isRandom || topic.trim()) && types.length > 0;
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto space-y-6">
@@ -66,13 +68,30 @@ export default function SetupForm({ onStart, loading }: SetupFormProps) {
       {/* Topic */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">🎯 主题 / 知识点</label>
-        <input
-          type="text"
-          value={topic}
-          onChange={e => setTopic(e.target.value)}
-          placeholder="例如：拉格朗日中值定理、B+树插入删除、IS-LM模型..."
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={topic}
+            onChange={e => { setTopic(e.target.value); setIsRandom(false); }}
+            placeholder="例如：拉格朗日中值定理、B+树插入删除、IS-LM模型..."
+            disabled={isRandom}
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-400"
+          />
+          <button
+            type="button"
+            onClick={() => { setIsRandom(!isRandom); if (!isRandom) setTopic(''); }}
+            className={`px-4 py-3 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${
+              isRandom
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🎲 随机
+          </button>
+        </div>
+        {isRandom && (
+          <p className="text-xs text-indigo-500 mt-1">AI 将从该课程中随机选择知识点出题，覆盖范围更广</p>
+        )}
       </div>
 
       {/* Difficulty */}
