@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const completion = await getDeepseek().chat.completions.create({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-flash',
       messages: messages.map((m: { role: string; content: string }) => ({
         role: m.role as 'system' | 'user' | 'assistant',
         content: m.content,

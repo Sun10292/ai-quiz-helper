@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 - 要求：题目要有代表性，覆盖该主题的核心知识点${weakPointsPrompt}`;
 
     const completion = await getDeepseek().chat.completions.create({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-flash',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage },

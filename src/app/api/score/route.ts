@@ -33,7 +33,7 @@ ${question.correctAnswer ? `出题时预设的答案：${question.correctAnswer}
 }`;
 
     const completion = await getDeepseek().chat.completions.create({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-flash',
       messages: [
         { role: 'user', content: prompt },
       ],
