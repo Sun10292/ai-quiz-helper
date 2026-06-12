@@ -51,6 +51,40 @@ npm run dev
 
 打开浏览器访问 [http://localhost:3000](http://localhost:3000)。
 
+## 🔧 使用其他 API 中转站
+
+如果你想用硅基流动、词元跳动等中转站代替 DeepSeek 官方 API，只需改两个地方：
+
+### 1. 修改 API 地址
+
+编辑 `src/lib/deepseek.ts`，把 `baseURL` 换成中转站的地址：
+
+```ts
+// DeepSeek 官方（默认）
+baseURL: 'https://api.deepseek.com',
+
+// 硅基流动
+baseURL: 'https://api.siliconflow.cn/v1',
+
+// 其他中转站
+baseURL: 'https://你的中转站地址/v1',
+```
+
+### 2. 修改 API Key
+
+编辑 `.env.local`，换成中转站的 Key：
+
+```
+DEEPSEEK_API_KEY=sk-你的中转站key
+```
+
+### 3. 修改模型名（如需要）
+
+如果中转站不支持 `deepseek-chat`，在三处 API 文件中搜 `deepseek-chat` 替换：
+- `src/app/api/generate/route.ts`
+- `src/app/api/score/route.ts`
+- `src/app/api/chat/route.ts`
+
 ## 📁 项目结构
 
 ```
