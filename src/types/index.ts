@@ -47,6 +47,7 @@ export interface GenerateRequest {
   count: number;
   types: QuestionType[];
   weakPointsPrompt?: string;  // from history analysis
+  note?: string;              // user custom notes
 }
 
 export interface ScoreRequest {

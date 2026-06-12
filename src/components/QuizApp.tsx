@@ -38,6 +38,7 @@ export default function QuizApp() {
     count: number;
     types: QuestionType[];
     weakPointsPrompt?: string;
+    note?: string;
   }) => {
     setLoading(true);
     setError('');

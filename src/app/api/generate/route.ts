@@ -61,12 +61,15 @@ export async function POST(request: NextRequest) {
     const typeList = (types || ['choice']).map(t => typeDescriptions[t]).join('、');
 
     const weakPointsPrompt = body.weakPointsPrompt || '';
+    const note = body.note || '';
+
+    const notePrompt = note ? `\n\n【学生的额外要求】\n${note}\n请严格遵守以上要求出题。` : '';
 
     const userMessage = `请生成 ${count || 5} 道${subject}方面的题目：
 - 主题：${topic}
 - 难度：${difficulty || 'medium'}
 - 题型：${typeList}
-- 要求：题目要有代表性，覆盖该主题的核心知识点${weakPointsPrompt}`;
+- 要求：题目要有代表性，覆盖该主题的核心知识点${weakPointsPrompt}${notePrompt}`;
 
     const completion = await getDeepseek().chat.completions.create({
       model: 'deepseek-v4-flash',

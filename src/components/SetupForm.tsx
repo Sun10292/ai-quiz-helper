@@ -11,6 +11,7 @@ interface SetupFormProps {
     count: number;
     types: QuestionType[];
     weakPointsPrompt?: string;
+    note?: string;
   }) => void;
   loading: boolean;
   hasHistory: boolean;
@@ -35,6 +36,7 @@ export default function SetupForm({ onStart, loading }: SetupFormProps) {
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [count, setCount] = useState(5);
   const [types, setTypes] = useState<QuestionType[]>(['choice']);
+  const [note, setNote] = useState('');
 
   const toggleType = (type: QuestionType) => {
     setTypes(prev =>
@@ -46,7 +48,7 @@ export default function SetupForm({ onStart, loading }: SetupFormProps) {
     e.preventDefault();
     const finalTopic = isRandom ? '随机（从该课程中任意选择知识点）' : topic.trim();
     if (!subject.trim() || (!isRandom && !topic.trim()) || types.length === 0) return;
-    onStart({ subject: subject.trim(), topic: finalTopic, difficulty, count, types });
+    onStart({ subject: subject.trim(), topic: finalTopic, difficulty, count, types, note: note.trim() });
   };
 
   const isValid = subject.trim() && (isRandom || topic.trim()) && types.length > 0;
@@ -154,6 +156,18 @@ export default function SetupForm({ onStart, loading }: SetupFormProps) {
           <span>1</span>
           <span>20</span>
         </div>
+      </div>
+
+      {/* Note */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">💬 备注 / 自定义要求（可选）</label>
+        <input
+          type="text"
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          placeholder="例如：不要出计算题、多出一些概念题、侧重应用题..."
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+        />
       </div>
 
       {/* Submit */}
